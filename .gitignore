@@ -36,3 +36,6 @@ htmlcov/
 
 # macOS
 .DS_Store
+
+# Plots directory
+plots/
