@@ -5,11 +5,13 @@
 import cartopy
 import fsspec
 from datetime import datetime as dt
+import os
 import pyart
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
 fs = fsspec.filesystem("s3", anon=True)
+os.makedirs("plots", exist_ok=True)
 
 # -* KPAH on 4/26/2026 (no tornado) *-
 print("**KPAH on 4/26/2026 (no tornado)**")
@@ -52,6 +54,7 @@ ax.add_feature(counties, linewidth=0.3, alpha=0.5)
 plt.title("KPAH-4/26/2026")
 plt.tight_layout()
 plt.savefig("plots/KPAH-4-26-2026.png", dpi=150)
+print(" Plotting complete!")
 print(" Plot saved as: plots/KPAH-4-26-2026.png")
 
 
@@ -70,6 +73,7 @@ print(" Data obtained: ", radar_tornado)
 vel_tornado = pyart.correct.dealias_region_based(radar_tornado)
 radar_tornado.add_field("dealiased_velocity", vel_tornado, replace_existing=True)
 
+print(" Plotting...")
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
 display = pyart.graph.RadarMapDisplay(radar_tornado)
@@ -92,4 +96,5 @@ ax.add_feature(counties, linewidth=0.3, alpha=0.5)
 plt.title("KPAH - 2024-05-27 00:47 UTC\nEF-3 Tornado: Lyon → Caldwell → Hopkins Co.")
 plt.tight_layout()
 plt.savefig("plots/KPAH-2024-05-27-tornado.png", dpi=150)
+print(" Plotting complete!")
 print(" Plot saved as: plots/KPAH-2024-05-27-tornado.png")
