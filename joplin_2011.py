@@ -16,29 +16,32 @@ from datetime import datetime, timedelta
 
 print("--Tornado Tracer--")
 
-# Download and plot scans 1 through 6
+# Connect and query AWS
+print("Connecting to AWS...")
+conn = nexradaws.NexradAwsInterface()
+start = datetime(2011, 5, 22, 22, 30, tzinfo=pytz.UTC)
+end   = datetime(2011, 5, 22, 23, 15, tzinfo=pytz.UTC)
+scans = conn.get_avail_scans_in_range(start, end, 'KSGF')
+print(f"Found {len(scans)} scans in window.")
+
 total_scans = 6
+templocation = tempfile.mkdtemp()
+
 for i in range(total_scans):
     print(f"\n[Scan {i+1}/{total_scans}]")
-    conn = nexradaws.NexradAwsInterface()
-    start = datetime(2011, 5, 22, 22, 30, tzinfo=pytz.UTC)
-    end   = datetime(2011, 5, 22, 23, 15, tzinfo=pytz.UTC)
-    scans = conn.get_avail_scans_in_range(start, end, 'KSGF')
     target_scan = scans[i]
-    templocation = tempfile.mkdtemp()
+
+    # Download
     results = conn.download(target_scan, templocation)
     localfile = results.success[0]
     print(f"Downloaded: {localfile.filepath}")
 
-    # Read with read_nexrad_archive instead of open_pyart()
+    # Read
     radar = pyart.io.read_nexrad_archive(localfile.filepath)
     print(f"Loaded {radar.nsweeps} sweeps.")
+    print(f"Real data points: {np.sum(~np.ma.getmaskarray(radar.fields['velocity']['data']))}")
 
-    # Check mask
-    vel = radar.fields['velocity']['data']
-    print(f"Real data points: {np.sum(~np.ma.getmaskarray(vel))}")
-
-    # Init gate coordinates
+    # Gate coordinates
     radar.init_gate_longitude_latitude()
     sweep_slice = radar.get_slice(1)
     gate_lons_s0 = radar.gate_longitude['data'][sweep_slice]
@@ -83,6 +86,7 @@ for i in range(total_scans):
     os.makedirs('plots', exist_ok=True)
     plt.tight_layout()
     plt.savefig(f'plots/KSGF_{time_str_file}.png', dpi=150)
+    plt.close()
     print(f"Saved plots/KSGF_{time_str_file}.png")
 
 print("\nDone. Have a nice day!")
