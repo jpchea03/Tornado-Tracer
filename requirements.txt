@@ -1,5 +1,6 @@
 arm-pyart
-fsspec 
-s3fs 
-matplotlib 
 cartopy
+matplotlib
+fsspec
+s3fs
+pytz
