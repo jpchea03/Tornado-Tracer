@@ -24,7 +24,7 @@ end   = datetime(2011, 5, 22, 23, 15, tzinfo=pytz.UTC)
 scans = conn.get_avail_scans_in_range(start, end, 'KSGF')
 print(f"Found {len(scans)} scans in window.")
 
-total_scans = 6
+total_scans = len(scans)
 templocation = tempfile.mkdtemp()
 
 for i in range(total_scans):
