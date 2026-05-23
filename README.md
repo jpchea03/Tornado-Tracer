@@ -40,12 +40,12 @@ Downloads and plots radial velocity scans from the May 22, 2011 Joplin tornado e
 - Download NEXRAD Level II scans from NOAA's public AWS S3 archive
 - Ingest and parse radar sweeps using Py-ART
 - Plot georeferenced radial velocity fields with county/state overlays
-- Validated against the May 22, 2011 Joplin, MO EF5 tornado (KSGF radar)
+- Test case May 2011 Joplin, MO EF 5 tornado
 
 ## Future Work
 
 - Implement Tornadic Vortex Signature (TVS) based detection algorithm
-- Path prediction from couplet motion vectors across successive scans
+- Use TVS algorithm at each scan to predict path the tornado took
 - User interface for first responder deployment
 
 ---
