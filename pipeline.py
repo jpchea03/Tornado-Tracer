@@ -94,6 +94,45 @@ def plot_scan(gate_lons_s0, gate_lats_s0, vel_s0, time_str_title, time_str_file,
     plt.close()
     print(f"Saved plots/{radar_id}_{time_str_file}.png")
 
+# Write a scan's gate-level data to its own csv file
+def write_to_csv(gate_lons_s0, gate_lats_s0, vel_s0, time_str_title, time_str_file, radar_id):
+    os.makedirs('data', exist_ok=True)
+    filepath = f'data/{radar_id}_{time_str_file}.csv'
+    nrays, ngates = vel_s0.shape
+    data = np.column_stack([gate_lons_s0.ravel(), gate_lats_s0.ravel(), vel_s0.ravel()])
+    with open(filepath, 'w', newline='') as csvfile:
+        csvfile.write(f'#radar_id:{radar_id}\n')
+        csvfile.write(f'#time_str_title:{time_str_title}\n')
+        csvfile.write(f'#time_str_file:{time_str_file}\n')
+        csvfile.write(f'#shape:{nrays},{ngates}\n')
+        np.savetxt(csvfile, data, delimiter=',', header='lon,lat,velocity', comments='')
+    print(f"Saved {filepath}")
+    return filepath
+
+# Read a scan's gate-level data back from its csv file
+def read_scan_csv(filepath):
+    metadata = {}
+    skip_rows = 0
+    with open(filepath, newline='') as csvfile:
+        for line in csvfile:
+            if not line.startswith('#'):
+                break
+            skip_rows += 1
+            key, value = line[1:].split(':', 1)
+            metadata[key.strip()] = value.strip()
+
+    nrays, ngates = (int(n) for n in metadata['shape'].split(','))
+    data = np.genfromtxt(filepath, delimiter=',', skip_header=skip_rows + 1)
+
+    return {
+        'gate_lons_s0': data[:, 0].reshape(nrays, ngates),
+        'gate_lats_s0': data[:, 1].reshape(nrays, ngates),
+        'vel_s0': data[:, 2].reshape(nrays, ngates),
+        'time_str_title': metadata['time_str_title'],
+        'time_str_file': metadata['time_str_file'],
+        'radar_id': metadata['radar_id']
+    }
+
 # Download, process, and plot all scans in the window
 def run_pipeline(start, end, radar_id):
     print("-Tornado Tracer-")
@@ -102,7 +141,8 @@ def run_pipeline(start, end, radar_id):
         target_scan = scans[i]
         print(f"\n[Scan {i+1}/{len(scans)}]")
         data = process_scan(target_scan, conn, templocation, radar_id)
-        plot_scan(**data)
+        filepath = write_to_csv(**data)
+        plot_scan(**read_scan_csv(filepath))
     shutil.rmtree(templocation)
     print("\nCleaned up temporary files.")
     print("Done. Have a nice day!")
