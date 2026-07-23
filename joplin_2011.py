@@ -1,7 +1,3 @@
-# Title: joplin_2011.py
-# Description: Test NEXRAD pipeline with the Joplin, MO tornado event on May 22, 2011.
-# Author: Joseph Cheatham
-
 from pipeline import run_pipeline
 import pytz
 from datetime import datetime

@@ -1,7 +1,3 @@
-# Title: pipeline.py
-# Description: A pipeline for downloading, processing, and plotting NEXRAD data.
-# Author: Joseph Cheatham
-
 import nexradaws
 import pyart
 import matplotlib.pyplot as plt
