@@ -4,7 +4,6 @@
 
 **Author:** Joseph Cheatham
 **Last Update:** 5/16/2026
-**Version:** 0.1.0
 
 An open source tornado path detection tool for first responders, built on NOAA NEXRAD Doppler radar data.
 Tornado Tracer is being developed to ingest real-time and historical Level II radar scans, detect tornadic
